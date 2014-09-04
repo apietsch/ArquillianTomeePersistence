@@ -1,0 +1,7 @@
+UserAccount:
+  - id: 1
+    firstname: Frank
+    lastname: Zappa
+  - id: 2
+    firstname: Pat
+    lastname: Metheny

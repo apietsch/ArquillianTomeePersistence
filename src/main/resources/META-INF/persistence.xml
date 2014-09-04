@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <persistence-unit name="ExamplePU" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <class>org.waastad.arquillianpersistence.entity.UserAccount</class>
+    <jta-data-source>ExampleDS</jta-data-source>
+    <properties>
+      <!--  <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/cisco"/>
+            <property name="javax.persistence.jdbc.password" value="satest"/>
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
+            <property name="javax.persistence.jdbc.user" value="satest"/>-->
+      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+      <property name="eclipselink.logging.level" value="FINE"/>
+    </properties>
+  </persistence-unit>
+</persistence>
