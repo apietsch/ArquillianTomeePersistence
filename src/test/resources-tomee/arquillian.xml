@@ -8,6 +8,9 @@
         <configuration>
             <property name="properties">
                 ExampleDS = new://Resource?type=DataSource
+                ExampleDS = org.hsqldb.jdbcDriver
+                ExampleDS = jdbc:hsqldb:mem:arquilliandb
+                ExampleDS = true
             </property>
         </configuration>
     </container>
