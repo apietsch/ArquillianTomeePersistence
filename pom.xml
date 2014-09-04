@@ -69,7 +69,7 @@
             <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--  <dependency>
+        <dependency>
             <groupId>org.apache.openejb</groupId>
             <artifactId>arquillian-tomee-remote</artifactId>
             <version>1.7.0</version>
@@ -82,13 +82,13 @@
             <classifier>plus</classifier>
             <type>zip</type>
             <scope>test</scope>
-        </dependency>-->
-        <dependency>
+        </dependency>
+        <!-- <dependency>
             <groupId>org.apache.openejb</groupId>
             <artifactId>arquillian-tomee-embedded</artifactId>
             <version>1.7.0</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>

@@ -4,7 +4,7 @@
             xsi:schemaLocation="http://jboss.org/schema/arquillian
     http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
     
-    <container default="true" qualifier="openejb-embedded-4">
+  <!--  <container default="true" qualifier="openejb-embedded-4">
         <configuration>
             <property name="properties">
                 ExampleDS = new://Resource?type=DataSource
@@ -16,24 +16,46 @@
         <property name="deploymentExportPath">target/deployment</property>
     </engine>
 
-    <!--  <container qualifier="tomee-remote" default="true">
+    <extension qualifier="persistence">
+        <property name="defaultDataSource">openejb:Resource/ExampleDS</property>
+    </extension>
+
+    <extension qualifier="persistence-dbunit">
+        <property name="datatypeFactory">org.dbunit.ext.hsqldb.HsqldbDataTypeFactory</property>
+    </extension>-->
+    
+    
+    
+    
+    
+    <container qualifier="tomee-remote" default="true">
         <configuration>
             <property name="httpPort">-1</property>
             <property name="stopPort">-1</property>
-            <property name="dir">target/apache-tomee-embedded</property>
+            <property name="dir">target/apache-tomee</property>
             <property name="appWorkingDir">target/arquillian-test-working-dir</property>
             <property name="conf">src/test/resources-tomee/conf</property>
+            <property name="properties">
+                ExampleDS = new://Resource?type=DataSource
+                ExampleDS = org.hsqldb.jdbcDriver
+                ExampleDS = jdbc:hsqldb:mem:arquilliandb
+                ExampleDS = true
+            </property>
         </configuration>
-    </container>-->
+    </container>
+    
+    <engine>
+        <property name="deploymentExportPath">target/deployment</property>
+    </engine>
 
     <extension qualifier="persistence">
         <property name="defaultDataSource">openejb:Resource/ExampleDS</property>
     </extension>
 
-   <!-- <extension qualifier="persistence-script">
+    <extension qualifier="persistence-script">
         <property name="scriptsToExecuteBeforeTest">SET DATABASE REFERENTIAL INTEGRITY FALSE</property>
         <property name="sqlStatementDelimiter">NEW_LINE</property>
-    </extension>-->
+    </extension>
 
     <extension qualifier="persistence-dbunit">
         <property name="datatypeFactory">org.dbunit.ext.hsqldb.HsqldbDataTypeFactory</property>
