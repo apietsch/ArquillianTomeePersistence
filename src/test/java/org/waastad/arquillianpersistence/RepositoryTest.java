@@ -62,6 +62,7 @@ public class RepositoryTest {
     @Test
     @UsingDataSet("users.yml")
     @InSequence(value = 1)
+//    @RunAsClient
     public void testSomeMethod() {
         List<UserAccount> users = userService.getUsers();
         Assert.assertEquals(2,users.size());
