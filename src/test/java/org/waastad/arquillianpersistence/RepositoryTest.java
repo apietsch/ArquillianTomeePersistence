@@ -5,13 +5,20 @@
  */
 package org.waastad.arquillianpersistence;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.persistence.UsingDataSet;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -62,7 +69,6 @@ public class RepositoryTest {
     @Test
     @UsingDataSet("users.yml")
     @InSequence(value = 1)
-//    @RunAsClient
     public void testSomeMethod() {
         List<UserAccount> users = userService.getUsers();
         Assert.assertEquals(2,users.size());
@@ -74,6 +80,20 @@ public class RepositoryTest {
     public void testSomeMethod2() {
         UserAccount findBy = userAccountRepository.findBy(1L);
         Assert.assertEquals("Frank",findBy.getFirstname());
+    }
+    
+    @Test
+    @UsingDataSet("users.yml")
+    @InSequence(value = 3)
+    public void testSomeMethod3() {
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        WebClient client = WebClient.create("http://localhost:8090", providers)
+                .path("test/users")
+                .type(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+        List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
+        Assert.assertEquals(2, get.size());
     }
 
 }
