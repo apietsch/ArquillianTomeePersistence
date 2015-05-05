@@ -7,10 +7,10 @@ package org.waastad.arquillianpersistence.service;
 
 import java.util.List;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -33,6 +33,11 @@ public class UserService {
     @GET
     public List<UserAccount> getUsers() {
         return userAccountRepository.findAll();
+    }
+
+    @POST
+    public UserAccount createUser(UserAccount account) {
+        return userAccountRepository.save(account);
     }
 
 }

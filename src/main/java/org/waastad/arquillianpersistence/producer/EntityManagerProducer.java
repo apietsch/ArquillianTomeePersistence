@@ -11,7 +11,9 @@ import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
+import org.apache.deltaspike.data.api.EntityManagerConfig;
 
 /**
  *
@@ -20,21 +22,29 @@ import javax.persistence.PersistenceUnit;
 @ApplicationScoped
 public class EntityManagerProducer {
 
-    @PersistenceUnit(unitName = "ExamplePU")
-    private EntityManagerFactory emf;
+    @PersistenceContext(unitName = "ExamplePU")
+    EntityManager em;
 
     @Produces
-    @Default
-    public EntityManager create() {
+    EntityManager createManager() {
         System.out.println("Producing entitymanager.....");
-        return this.emf.createEntityManager();
+        return em;
     }
 
-    public void close(@Disposes @Default EntityManager em) {
-        System.out.println("Disposing entitymanager.....");
-        if (em.isOpen()) {
-            em.close();
-        }
-    }
-
+//    @PersistenceUnit(unitName = "ExamplePU")
+//    private EntityManagerFactory emf;
+//
+//    @Produces
+//    @Default
+//    public EntityManager create() {
+//        System.out.println("Producing entitymanager.....");
+//        return this.emf.createEntityManager();
+//    }
+//
+//    public void close(@Disposes @Default EntityManager em) {
+//        System.out.println("Disposing entitymanager.....");
+//        if (em.isOpen()) {
+//            em.close();
+//        }
+//    }
 }

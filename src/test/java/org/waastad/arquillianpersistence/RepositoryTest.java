@@ -7,22 +7,21 @@ package org.waastad.arquillianpersistence;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.persistence.UsingDataSet;
-import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+import org.jboss.shrinkwrap.descriptor.api.beans10.BeansDescriptor;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,10 +40,14 @@ public class RepositoryTest {
 
     @Deployment(testable = true)
     public static Archive<?> createDeploymentPackage() {
+        BeansDescriptor beans = Descriptors.create(BeansDescriptor.class).getOrCreateAlternatives().clazz("org.apache.deltaspike.jpa.impl.transaction.ContainerManagedTransactionStrategy").up();
+
+//                .createAlternatives().clazz("org.apache.deltaspike.jpa.impl.transaction.ContainerManagedTransactionStrategy").up();
         File[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeDependencies().resolve().withTransitivity().asFile();
         return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(UserService.class, EntityManagerProducer.class, UserAccountRepository.class, UserAccount.class)
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsWebInfResource(new StringAsset(beans.exportAsString()), "beans.xml")
+                //                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addAsWebInfResource("test-persistence.xml", "persistence.xml")
                 .addAsLibraries(libs);
     }
@@ -71,17 +74,17 @@ public class RepositoryTest {
     @InSequence(value = 1)
     public void testSomeMethod() {
         List<UserAccount> users = userService.getUsers();
-        Assert.assertEquals(2,users.size());
+        Assert.assertEquals(2, users.size());
     }
-    
+
     @Test
     @UsingDataSet("users.yml")
     @InSequence(value = 2)
     public void testSomeMethod2() {
         UserAccount findBy = userAccountRepository.findBy(1L);
-        Assert.assertEquals("Frank",findBy.getFirstname());
+        Assert.assertEquals("Frank", findBy.getFirstname());
     }
-    
+
     @Test
     @UsingDataSet("users.yml")
     @InSequence(value = 3)
@@ -94,6 +97,18 @@ public class RepositoryTest {
                 .accept(MediaType.APPLICATION_JSON);
         List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
         Assert.assertEquals(2, get.size());
+    }
+
+    @Test
+    @UsingDataSet("users.yml")
+    @InSequence(value = 4)
+    public void testSomeMethod4() {
+        List<UserAccount> users = userService.getUsers();
+        Assert.assertEquals(2, users.size());
+        UserAccount findBy = new UserAccount("first", "last");
+        userService.createUser(findBy);
+        users = userService.getUsers();
+        Assert.assertEquals(3, users.size());
     }
 
 }

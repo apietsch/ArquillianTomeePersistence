@@ -21,12 +21,20 @@ public class UserAccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Basic
     private String firstname;
     @Basic
     private String lastname;
+
+    public UserAccount() {
+    }
+
+    public UserAccount(String firstname, String lastname) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+    }
 
     public Long getId() {
         return id;
