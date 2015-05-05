@@ -30,21 +30,4 @@ public class EntityManagerProducer {
         System.out.println("Producing entitymanager.....");
         return em;
     }
-
-//    @PersistenceUnit(unitName = "ExamplePU")
-//    private EntityManagerFactory emf;
-//
-//    @Produces
-//    @Default
-//    public EntityManager create() {
-//        System.out.println("Producing entitymanager.....");
-//        return this.emf.createEntityManager();
-//    }
-//
-//    public void close(@Disposes @Default EntityManager em) {
-//        System.out.println("Disposing entitymanager.....");
-//        if (em.isOpen()) {
-//            em.close();
-//        }
-//    }
 }

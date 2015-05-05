@@ -5,10 +5,6 @@
         <class>org.waastad.arquillianpersistence.entity.UserAccount</class>
         <jta-data-source>ExampleDS</jta-data-source>
         <properties>
-            <!--  <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/cisco"/>
-            <property name="javax.persistence.jdbc.password" value="satest"/>
-            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
-            <property name="javax.persistence.jdbc.user" value="satest"/>-->
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
             <property name="eclipselink.logging.level" value="FINE"/>
         </properties>
