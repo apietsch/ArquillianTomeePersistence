@@ -5,12 +5,16 @@
  */
 package org.waastad.arquillianpersistence;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -42,28 +46,14 @@ public class RepositoryTest {
     public static Archive<?> createDeploymentPackage() {
         BeansDescriptor beans = Descriptors.create(BeansDescriptor.class).getOrCreateAlternatives().clazz("org.apache.deltaspike.jpa.impl.transaction.ContainerManagedTransactionStrategy").up();
 
-//                .createAlternatives().clazz("org.apache.deltaspike.jpa.impl.transaction.ContainerManagedTransactionStrategy").up();
         File[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeDependencies().resolve().withTransitivity().asFile();
         return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(UserService.class, EntityManagerProducer.class, UserAccountRepository.class, UserAccount.class)
                 .addAsWebInfResource(new StringAsset(beans.exportAsString()), "beans.xml")
-                //                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addAsWebInfResource("test-persistence.xml", "persistence.xml")
                 .addAsLibraries(libs);
     }
 
-//    @Deployment(testable = true)
-//    public static Archive<?> createDeploymentPackageJar() {
-//        JavaArchive[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeDependencies().resolve().withTransitivity().as(JavaArchive.class);
-//        JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test.jar")
-//                .addClasses(UserService.class, EntityManagerProducer.class, UserAccountRepository.class, UserAccount.class)
-//                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
-//                .addAsManifestResource("test-persistence.xml", "persistence.xml");
-//        for (JavaArchive lib : libs) {
-//            archive = archive.merge(lib);
-//        }
-//        return archive;
-//    }
     @Inject
     private UserService userService;
     @Inject
@@ -109,6 +99,27 @@ public class RepositoryTest {
         userService.createUser(findBy);
         users = userService.getUsers();
         Assert.assertEquals(3, users.size());
+    }
+
+    @Test
+    @UsingDataSet("users.yml")
+    @InSequence(value = 5)
+    public void testSomeMethod5() throws Exception {
+        ObjectMapper mappe = new ObjectMapper();
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        UserAccount findBy = new UserAccount("first", "last");
+        WebClient client = WebClient.create("http://localhost:8090", providers)
+                .path("test/users")
+                .type(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+        ClientConfiguration config = WebClient.getConfig(client);
+        config.getOutInterceptors().add(new LoggingOutInterceptor());
+        config.getInInterceptors().add(new LoggingInInterceptor());
+        UserAccount post = client.post(findBy, UserAccount.class);
+        System.out.println(mappe.writerWithDefaultPrettyPrinter().writeValueAsString(post));
+        List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
+        Assert.assertEquals(3, get.size());
     }
 
 }
