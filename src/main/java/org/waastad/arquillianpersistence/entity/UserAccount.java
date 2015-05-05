@@ -14,7 +14,7 @@ import javax.persistence.Id;
 
 /**
  *
- * @author Helge Waastad <helge.waastad@datametrix.no>
+ * @author Helge Waastad <helge.waastad@waastad.org>
  */
 @Entity
 public class UserAccount implements Serializable {

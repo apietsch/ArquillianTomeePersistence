@@ -17,7 +17,7 @@ import org.apache.deltaspike.data.api.EntityManagerConfig;
 
 /**
  *
- * @author Helge Waastad <helge.waastad@datametrix.no>
+ * @author Helge Waastad <helge.waastad@waastad.org>
  */
 @ApplicationScoped
 public class EntityManagerProducer {

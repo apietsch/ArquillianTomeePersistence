@@ -37,7 +37,7 @@ import org.waastad.arquillianpersistence.service.UserService;
 
 /**
  *
- * @author Helge Waastad <helge.waastad@datametrix.no>
+ * @author Helge Waastad <helge.waastad@waastad.org>
  */
 @RunWith(Arquillian.class)
 public class RepositoryTest {

@@ -19,7 +19,7 @@ import org.waastad.arquillianpersistence.repository.UserAccountRepository;
 
 /**
  *
- * @author Helge Waastad <helge.waastad@datametrix.no>
+ * @author Helge Waastad <helge.waastad@waastad.org>
  */
 @Path("users")
 @Singleton

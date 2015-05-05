@@ -11,7 +11,7 @@ import org.waastad.arquillianpersistence.entity.UserAccount;
 
 /**
  *
- * @author Helge Waastad <helge.waastad@datametrix.no>
+ * @author Helge Waastad <helge.waastad@waastad.org>
  */
 @Repository
 public abstract class UserAccountRepository extends AbstractEntityRepository<UserAccount, Long> {
