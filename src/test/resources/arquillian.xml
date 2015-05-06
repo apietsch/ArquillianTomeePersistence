@@ -4,18 +4,16 @@
             xsi:schemaLocation="http://jboss.org/schema/arquillian
     http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
     
-  <!--  <container default="true" qualifier="openejb-embedded-4">
+  <container default="true" qualifier="openejb-embedded-4">
         <configuration>
             <property name="properties">
+                openejb.embedded.remotable = true
                 ExampleDS = new://Resource?type=DataSource
-                ExampleDS = org.hsqldb.jdbcDriver
-                ExampleDS = jdbc:hsqldb:mem:arquilliandb
-                ExampleDS = true
             </property>
         </configuration>
     </container>
 
-    <engine>
+   <!-- <engine>
         <property name="deploymentExportPath">target/deployment</property>
     </engine>
 
@@ -29,9 +27,9 @@
     
     
     
-    <defaultProtocol type="Servlet 2.5" />
+   <!-- <defaultProtocol type="Servlet 2.5" />-->
     
-    <container qualifier="tomee-remote" default="true">
+    <container qualifier="tomee-remote" default="false">
         <configuration>
             <property name="httpPort">8090</property>
             <property name="stopPort">-1</property>
@@ -47,7 +45,7 @@
         </configuration>
     </container>
     
-    <engine>
+  <!--  <engine>
         <property name="deploymentExportPath">target/deployment</property>
     </engine>
 
@@ -62,6 +60,6 @@
 
     <extension qualifier="persistence-dbunit">
         <property name="datatypeFactory">org.dbunit.ext.hsqldb.HsqldbDataTypeFactory</property>
-    </extension>
+    </extension>-->
 
 </arquillian>

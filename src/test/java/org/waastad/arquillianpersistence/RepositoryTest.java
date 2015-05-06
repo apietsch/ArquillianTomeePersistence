@@ -20,6 +20,8 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.persistence.UsingDataSet;
+import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
+import org.jboss.arquillian.transaction.api.annotation.Transactional;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -60,6 +62,7 @@ public class RepositoryTest {
     UserAccountRepository userAccountRepository;
 
     @Test
+    @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("users.yml")
     @InSequence(value = 1)
     public void testSomeMethod() {
@@ -68,6 +71,7 @@ public class RepositoryTest {
     }
 
     @Test
+    @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("users.yml")
     @InSequence(value = 2)
     public void testSomeMethod2() {
@@ -76,12 +80,13 @@ public class RepositoryTest {
     }
 
     @Test
+    @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("users.yml")
     @InSequence(value = 3)
     public void testSomeMethod3() {
         List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
-        WebClient client = WebClient.create("http://localhost:8090", providers)
+        WebClient client = WebClient.create("http://localhost:4204", providers)
                 .path("test/users")
                 .type(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
@@ -90,6 +95,7 @@ public class RepositoryTest {
     }
 
     @Test
+    @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("users.yml")
     @InSequence(value = 4)
     public void testSomeMethod4() {
@@ -102,6 +108,7 @@ public class RepositoryTest {
     }
 
     @Test
+    @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("users.yml")
     @InSequence(value = 5)
     public void testSomeMethod5() throws Exception {
@@ -109,7 +116,7 @@ public class RepositoryTest {
         List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         UserAccount findBy = new UserAccount("first", "last");
-        WebClient client = WebClient.create("http://localhost:8090", providers)
+        WebClient client = WebClient.create("http://localhost:4204", providers)
                 .path("test/users")
                 .type(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
