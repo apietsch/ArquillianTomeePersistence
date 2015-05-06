@@ -19,6 +19,8 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
+import org.jboss.arquillian.persistence.Cleanup;
+import org.jboss.arquillian.persistence.TestExecutionPhase;
 import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
@@ -42,6 +44,7 @@ import org.waastad.arquillianpersistence.service.UserService;
  * @author Helge Waastad <helge.waastad@waastad.org>
  */
 @RunWith(Arquillian.class)
+//@UsingDataSet("users.yml")
 public class RepositoryTest {
 
     @Deployment(testable = true)
@@ -63,8 +66,9 @@ public class RepositoryTest {
 
     @Test
     @Transactional(TransactionMode.COMMIT)
-    @UsingDataSet("users.yml")
     @InSequence(value = 1)
+    @UsingDataSet("users.yml")
+    @Cleanup(phase = TestExecutionPhase.BEFORE)
     public void testSomeMethod() {
         List<UserAccount> users = userService.getUsers();
         Assert.assertEquals(2, users.size());
@@ -72,7 +76,7 @@ public class RepositoryTest {
 
     @Test
     @Transactional(TransactionMode.COMMIT)
-    @UsingDataSet("users.yml")
+    @Cleanup(phase = TestExecutionPhase.NONE)
     @InSequence(value = 2)
     public void testSomeMethod2() {
         UserAccount findBy = userAccountRepository.findBy(1L);
@@ -81,8 +85,8 @@ public class RepositoryTest {
 
     @Test
     @Transactional(TransactionMode.COMMIT)
-    @UsingDataSet("users.yml")
     @InSequence(value = 3)
+    @Cleanup(phase = TestExecutionPhase.NONE)
     public void testSomeMethod3() {
         List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
@@ -96,8 +100,8 @@ public class RepositoryTest {
 
     @Test
     @Transactional(TransactionMode.COMMIT)
-    @UsingDataSet("users.yml")
     @InSequence(value = 4)
+    @Cleanup(phase = TestExecutionPhase.NONE)
     public void testSomeMethod4() {
         List<UserAccount> users = userService.getUsers();
         Assert.assertEquals(2, users.size());
@@ -109,8 +113,8 @@ public class RepositoryTest {
 
     @Test
     @Transactional(TransactionMode.COMMIT)
-    @UsingDataSet("users.yml")
     @InSequence(value = 5)
+    @Cleanup(phase = TestExecutionPhase.NONE)
     public void testSomeMethod5() throws Exception {
         ObjectMapper mappe = new ObjectMapper();
         List<Object> providers = new ArrayList<>();
@@ -126,7 +130,7 @@ public class RepositoryTest {
         UserAccount post = client.post(findBy, UserAccount.class);
         System.out.println(mappe.writerWithDefaultPrettyPrinter().writeValueAsString(post));
         List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
-        Assert.assertEquals(3, get.size());
+        Assert.assertEquals(4, get.size());
     }
 
 }
