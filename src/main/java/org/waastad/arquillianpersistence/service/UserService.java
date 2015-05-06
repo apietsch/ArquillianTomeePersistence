@@ -14,6 +14,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import org.waastad.arquillianpersistence.ejb.AuthUtility;
+import org.waastad.arquillianpersistence.ejb.AuthorizeBean;
 import org.waastad.arquillianpersistence.entity.UserAccount;
 import org.waastad.arquillianpersistence.repository.UserAccountRepository;
 
@@ -29,6 +31,8 @@ public class UserService {
 
     @Inject
     private UserAccountRepository userAccountRepository;
+    @Inject
+    private AuthUtility authorizeBean;
 
     @GET
     public List<UserAccount> getUsers() {
@@ -38,6 +42,13 @@ public class UserService {
     @POST
     public UserAccount createUser(UserAccount account) {
         return userAccountRepository.save(account);
+    }
+
+    @GET
+    @Path("test")
+    public String whatever() {
+        authorizeBean.authorize("asdasd");
+        return "OK";
     }
 
 }
