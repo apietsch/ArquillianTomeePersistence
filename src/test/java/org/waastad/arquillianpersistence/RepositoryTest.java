@@ -8,6 +8,8 @@ package org.waastad.arquillianpersistence;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -20,6 +22,8 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.persistence.UsingDataSet;
+import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
+import org.jboss.arquillian.transaction.api.annotation.Transactional;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -31,6 +35,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.waastad.arquillianpersistence.entity.UserAccount;
+import org.waastad.arquillianpersistence.filter.TokenFilter;
 import org.waastad.arquillianpersistence.producer.EntityManagerProducer;
 import org.waastad.arquillianpersistence.repository.UserAccountRepository;
 import org.waastad.arquillianpersistence.service.UserService;
@@ -42,13 +47,15 @@ import org.waastad.arquillianpersistence.service.UserService;
 @RunWith(Arquillian.class)
 public class RepositoryTest {
 
-    @Deployment(testable = true)
+//    @ArquillianResource
+//    private URL url;
+    @Deployment
     public static Archive<?> createDeploymentPackage() {
         BeansDescriptor beans = Descriptors.create(BeansDescriptor.class).getOrCreateAlternatives().clazz("org.apache.deltaspike.jpa.impl.transaction.ContainerManagedTransactionStrategy").up();
 
         File[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeDependencies().resolve().withTransitivity().asFile();
         return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addClasses(UserService.class, EntityManagerProducer.class, UserAccountRepository.class, UserAccount.class)
+                .addClasses(UserService.class, TokenFilter.class, EntityManagerProducer.class, UserAccountRepository.class, UserAccount.class)
                 .addAsWebInfResource(new StringAsset(beans.exportAsString()), "beans.xml")
                 .addAsWebInfResource("test-persistence.xml", "persistence.xml")
                 .addAsLibraries(libs);
@@ -57,19 +64,13 @@ public class RepositoryTest {
     @Inject
     private UserService userService;
     @Inject
-    UserAccountRepository userAccountRepository;
+    private UserAccountRepository userAccountRepository;
+
 
     @Test
     @UsingDataSet("users.yml")
+    @Transactional(TransactionMode.COMMIT)
     @InSequence(value = 1)
-    public void testSomeMethod() {
-        List<UserAccount> users = userService.getUsers();
-        Assert.assertEquals(2, users.size());
-    }
-
-    @Test
-    @UsingDataSet("users.yml")
-    @InSequence(value = 2)
     public void testSomeMethod2() {
         UserAccount findBy = userAccountRepository.findBy(1L);
         Assert.assertEquals("Frank", findBy.getFirstname());
@@ -77,41 +78,35 @@ public class RepositoryTest {
 
     @Test
     @UsingDataSet("users.yml")
-    @InSequence(value = 3)
-    public void testSomeMethod3() {
+    @Transactional(TransactionMode.COMMIT)
+    @InSequence(value = 2)
+    public void testSomeMethod3() throws Exception {
         List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
-        WebClient client = WebClient.create("http://localhost:8090", providers)
+        WebClient client = WebClient.create(getUrl(), providers)
                 .path("test/users")
+                .header("token", "admin")
                 .type(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
+        ClientConfiguration config = WebClient.getConfig(client);
+        config.getOutInterceptors().add(new LoggingOutInterceptor());
+        config.getInInterceptors().add(new LoggingInInterceptor());
         List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
         Assert.assertEquals(2, get.size());
     }
 
     @Test
     @UsingDataSet("users.yml")
-    @InSequence(value = 4)
-    public void testSomeMethod4() {
-        List<UserAccount> users = userService.getUsers();
-        Assert.assertEquals(2, users.size());
-        UserAccount findBy = new UserAccount("first", "last");
-        userService.createUser(findBy);
-        users = userService.getUsers();
-        Assert.assertEquals(3, users.size());
-    }
-
-    @Test
-    @UsingDataSet("users.yml")
-    @InSequence(value = 5)
+    @InSequence(value = 3)
     public void testSomeMethod5() throws Exception {
         ObjectMapper mappe = new ObjectMapper();
         List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         UserAccount findBy = new UserAccount("first", "last");
-        WebClient client = WebClient.create("http://localhost:8090", providers)
+        WebClient client = WebClient.create(getUrl(), providers)
                 .path("test/users")
                 .type(MediaType.APPLICATION_JSON)
+                .header("token", "admin")
                 .accept(MediaType.APPLICATION_JSON);
         ClientConfiguration config = WebClient.getConfig(client);
         config.getOutInterceptors().add(new LoggingOutInterceptor());
@@ -122,4 +117,8 @@ public class RepositoryTest {
         Assert.assertEquals(3, get.size());
     }
 
+    private String getUrl() throws MalformedURLException {
+        URL url = new URL("http://localhost:" + System.getProperty("tomee.httpPort"));
+        return url.toString();
+    }
 }

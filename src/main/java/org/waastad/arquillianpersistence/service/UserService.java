@@ -6,6 +6,7 @@
 package org.waastad.arquillianpersistence.service;
 
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -31,6 +32,7 @@ public class UserService {
     private UserAccountRepository userAccountRepository;
 
     @GET
+    @RolesAllowed("admins")
     public List<UserAccount> getUsers() {
         return userAccountRepository.findAll();
     }
