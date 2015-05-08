@@ -8,11 +8,12 @@ package org.waastad.arquillianpersistence;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import javax.security.auth.login.LoginException;
 import javax.ws.rs.core.MediaType;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -24,6 +25,7 @@ import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.persistence.Cleanup;
 import org.jboss.arquillian.persistence.TestExecutionPhase;
 import org.jboss.arquillian.persistence.UsingDataSet;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
 import org.jboss.shrinkwrap.api.Archive;
@@ -55,6 +57,9 @@ public class RepositoryTest {
     @Mock
     @Produces
     private static AuthUtility authMock;
+
+    @ArquillianResource
+    private URL url;
 
     @Deployment(testable = true)
     public static Archive<?> createDeploymentPackage() {
@@ -94,13 +99,9 @@ public class RepositoryTest {
     @Test
     @InSequence(value = 3)
     @Cleanup(phase = TestExecutionPhase.NONE)
-    public void testSomeMethod3() {
-        List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
-        WebClient client = WebClient.create("http://localhost:4204", providers)
-                .path("test/users")
-                .type(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
+    public void testSomeMethod3() throws Exception {
+        WebClient client = getWebClient()
+                .path("users");
         List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
         Assert.assertEquals(2, get.size());
     }
@@ -122,16 +123,10 @@ public class RepositoryTest {
     @Cleanup(phase = TestExecutionPhase.NONE)
     public void testSomeMethod5() throws Exception {
         ObjectMapper mappe = new ObjectMapper();
-        List<Object> providers = new ArrayList<>();
-        providers.add(new JacksonJsonProvider());
         UserAccount findBy = new UserAccount("first", "last");
-        WebClient client = WebClient.create("http://localhost:4204", providers)
-                .path("test/users")
-                .type(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-        ClientConfiguration config = WebClient.getConfig(client);
-        config.getOutInterceptors().add(new LoggingOutInterceptor());
-        config.getInInterceptors().add(new LoggingInInterceptor());
+        WebClient client = getWebClient()
+                .path("users");
+
         UserAccount post = client.post(findBy, UserAccount.class);
         System.out.println(mappe.writerWithDefaultPrettyPrinter().writeValueAsString(post));
         List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
@@ -143,16 +138,21 @@ public class RepositoryTest {
     @Cleanup(phase = TestExecutionPhase.NONE)
     public void testSomeMethod6() throws Exception {
         Mockito.when(authMock.authorize(Matchers.anyString())).thenReturn(Boolean.TRUE);
+        WebClient client = getWebClient()
+                .path("users/test");
+        String get = client.get(String.class);
+    }
+
+    private WebClient getWebClient() throws MalformedURLException {
+//        URL url = new URL("http://localhost:" + System.getProperty("tomee.httpPort"));
         List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
-        WebClient client = WebClient.create("http://localhost:4204", providers)
-                .path("test/users/test")
-                .type(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
+        WebClient client = WebClient.create(url.toString(), providers);
         ClientConfiguration config = WebClient.getConfig(client);
         config.getOutInterceptors().add(new LoggingOutInterceptor());
         config.getInInterceptors().add(new LoggingInInterceptor());
-        String get = client.get(String.class);
+        client.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
+        return client;
     }
 
 }

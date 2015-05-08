@@ -6,6 +6,7 @@
     
   <container default="true" qualifier="openejb-embedded-4">
         <configuration>
+            <property name="httpPort">8090</property>
             <property name="properties">
                 openejb.embedded.remotable = true
                 ExampleDS = new://Resource?type=DataSource
