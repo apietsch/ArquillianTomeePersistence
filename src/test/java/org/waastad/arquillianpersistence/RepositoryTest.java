@@ -43,6 +43,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.waastad.arquillianpersistence.ejb.AuthUtility;
 import org.waastad.arquillianpersistence.entity.UserAccount;
+import org.waastad.arquillianpersistence.filter.TokenFilter;
 import org.waastad.arquillianpersistence.producer.EntityManagerProducer;
 import org.waastad.arquillianpersistence.repository.UserAccountRepository;
 import org.waastad.arquillianpersistence.service.UserService;

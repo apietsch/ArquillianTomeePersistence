@@ -4,21 +4,31 @@
             xsi:schemaLocation="http://jboss.org/schema/arquillian
     http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
     
-  <container default="true" qualifier="openejb-embedded-4">
+  <container default="false" qualifier="openejb-embedded-4">
         <configuration>
-            <property name="httpPort">8090</property>
             <property name="properties">
                 openejb.embedded.remotable = true
+                openejb.authentication.realmName = PropertiesLogin
+                ExampleDS = new://Resource?type=DataSource
+            </property>
+        </configuration>
+    </container>
+    
+    <container default="true" qualifier="tomee-embedded">
+        <configuration>
+            <property name="properties">
+                openejb.embedded.remotable = true
+                openejb.authentication.realmName = PropertiesLogin
                 ExampleDS = new://Resource?type=DataSource
             </property>
         </configuration>
     </container>
 
-   <!-- <engine>
+    <engine>
         <property name="deploymentExportPath">target/deployment</property>
     </engine>
 
-    <extension qualifier="persistence">
+   <!-- <extension qualifier="persistence">
         <property name="defaultDataSource">openejb:Resource/ExampleDS</property>
     </extension>
 
