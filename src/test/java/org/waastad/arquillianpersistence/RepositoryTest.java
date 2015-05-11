@@ -5,11 +5,22 @@
  */
 package org.waastad.arquillianpersistence;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.persistence.UsingDataSet;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.arquillian.transaction.api.annotation.TransactionMode;
 import org.jboss.arquillian.transaction.api.annotation.Transactional;
 import org.jboss.shrinkwrap.api.Archive;
@@ -36,7 +47,7 @@ import org.waastad.arquillianpersistence.service.UserService;
 @RunWith(Arquillian.class)
 public class RepositoryTest {
 
-    @Deployment
+    @Deployment(testable = false)
     public static Archive<?> createDeploymentPackage() {
         BeansDescriptor beans = Descriptors.create(BeansDescriptor.class).getOrCreateAlternatives().clazz("org.apache.deltaspike.jpa.impl.transaction.ContainerManagedTransactionStrategy").up();
 
@@ -48,26 +59,29 @@ public class RepositoryTest {
                 .addAsLibraries(libs);
     }
 
+    @ArquillianResource
+    private URL url;
+
     @Test
     @InSequence(value = 1)
     @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("datasets/users.yml")
     public void testSomeMethod3() throws Exception {
-//        WebClient client = getWebClient()
-//                .path("users");
-//        List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
-        Assert.assertEquals(2, 2);
+        WebClient client = getWebClient()
+                .path("users");
+        List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
+        Assert.assertEquals(2, get.size());
     }
 
-//    private WebClient getWebClient() throws MalformedURLException {
-////        URL url = new URL("http://localhost:" + System.getProperty("tomee.httpPort"));
-//        List<Object> providers = new ArrayList<>();
-//        providers.add(new JacksonJsonProvider());
-//        WebClient client = WebClient.create(url.toString(), providers);
-//        ClientConfiguration config = WebClient.getConfig(client);
-//        config.getOutInterceptors().add(new LoggingOutInterceptor());
-//        config.getInInterceptors().add(new LoggingInInterceptor());
-//        client.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
-//        return client;
-//    }
+    private WebClient getWebClient() throws MalformedURLException {
+//        URL url = new URL("http://localhost:" + System.getProperty("tomee.httpPort"));
+        List<Object> providers = new ArrayList<>();
+        providers.add(new JacksonJsonProvider());
+        WebClient client = WebClient.create(url.toString(), providers);
+        ClientConfiguration config = WebClient.getConfig(client);
+        config.getOutInterceptors().add(new LoggingOutInterceptor());
+        config.getInInterceptors().add(new LoggingInInterceptor());
+        client.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
+        return client;
+    }
 }

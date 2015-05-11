@@ -1,1 +1,2 @@
 org.jboss.arquillian.persistence.core.container.RemotePersistenceExtension
+org.apache.openejb.arquillian.embedded.EmbeddedRemoteExtension
