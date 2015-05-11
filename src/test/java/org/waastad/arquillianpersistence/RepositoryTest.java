@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 import org.waastad.arquillianpersistence.ejb.AuthUtility;
 import org.waastad.arquillianpersistence.ejb.AuthorizeBean;
 import org.waastad.arquillianpersistence.entity.UserAccount;
+import org.waastad.arquillianpersistence.filter.TokenFilter;
 import org.waastad.arquillianpersistence.producer.EntityManagerProducer;
 import org.waastad.arquillianpersistence.repository.UserAccountRepository;
 import org.waastad.arquillianpersistence.service.UserService;
@@ -53,7 +54,7 @@ public class RepositoryTest {
 
         File[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeDependencies().resolve().withTransitivity().asFile();
         return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addClasses(UserService.class, AuthorizeBean.class, EntityManagerProducer.class, UserAccountRepository.class, UserAccount.class, AuthUtility.class)
+                .addClasses(UserService.class, AuthorizeBean.class, EntityManagerProducer.class, TokenFilter.class, UserAccountRepository.class, UserAccount.class, AuthUtility.class)
                 .addAsWebInfResource(new StringAsset(beans.exportAsString()), "beans.xml")
                 .addAsWebInfResource("test-persistence.xml", "persistence.xml")
                 .addAsLibraries(libs);
