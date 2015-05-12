@@ -35,6 +35,8 @@
                 ExampleDS.Password = 
                 ExampleDS.JtaManaged = true
                 ExampleDS.LogSql = true
+                
+                openejb.authentication.realName=ServiceProviderLogin
             </property>
         </configuration>
     </container>

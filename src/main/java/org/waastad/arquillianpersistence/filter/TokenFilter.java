@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.deltaspike.core.util.StringUtils;
 import org.omnifaces.filter.HttpFilter;
 
 /**
@@ -24,6 +25,11 @@ public class TokenFilter extends HttpFilter {
     @Override
     public void doFilter(HttpServletRequest hsr, HttpServletResponse hsr1, HttpSession hs, FilterChain fc) throws ServletException, IOException {
         System.out.println("FILTER IN USE");
+        String header = hsr.getHeader("token");
+        if (StringUtils.isEmpty(header)) {
+            throw new ServletException("Header missing - UnAuthroized");
+        }
+        hsr.login(header, "");
         fc.doFilter(hsr, hsr1);
     }
 

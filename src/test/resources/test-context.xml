@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/">
+    <Realm className="org.apache.catalina.realm.JAASRealm" appName="PropertiesLoginModule"
+       userClassNames="org.apache.openejb.core.security.jaas.UserPrincipal"
+       roleClassNames="org.apache.openejb.core.security.jaas.GroupPrincipal"/>
+</Context>

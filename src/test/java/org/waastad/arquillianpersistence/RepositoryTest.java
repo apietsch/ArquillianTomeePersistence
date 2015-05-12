@@ -57,6 +57,7 @@ public class RepositoryTest {
                 .addClasses(UserService.class, AuthorizeBean.class, EntityManagerProducer.class, TokenFilter.class, UserAccountRepository.class, UserAccount.class, AuthUtility.class)
                 .addAsWebInfResource(new StringAsset(beans.exportAsString()), "beans.xml")
                 .addAsWebInfResource("test-persistence.xml", "persistence.xml")
+                .addAsManifestResource("test-context.xml", "context.xml")
                 .addAsLibraries(libs);
     }
 
@@ -68,14 +69,25 @@ public class RepositoryTest {
     @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("datasets/users.yml")
     public void testSomeMethod3() throws Exception {
-        WebClient client = getWebClient()
+        WebClient client = getAdminWebClient()
                 .path("users");
         List<UserAccount> get = (List<UserAccount>) client.getCollection(UserAccount.class);
         Assert.assertEquals(2, get.size());
+        
+        client = getAdminWebClient()
+                .path("users").path("super");
+        client.get();
+        Assert.assertEquals(403,client.getResponse().getStatus());
+        
+        client = getWrongTokenWebClient()
+                .path("users").path("super");
+        client.get();
+        Assert.assertEquals(500,client.getResponse().getStatus());
+
+        
     }
 
-    private WebClient getWebClient() throws MalformedURLException {
-//        URL url = new URL("http://localhost:" + System.getProperty("tomee.httpPort"));
+    private WebClient getBaseWebClient() throws MalformedURLException {
         List<Object> providers = new ArrayList<>();
         providers.add(new JacksonJsonProvider());
         WebClient client = WebClient.create(url.toString(), providers);
@@ -84,5 +96,23 @@ public class RepositoryTest {
         config.getInInterceptors().add(new LoggingInInterceptor());
         client.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
         return client;
+    }
+
+    private WebClient getAdminWebClient() throws MalformedURLException {
+        WebClient baseWebClient = getBaseWebClient();
+        baseWebClient.header("token", "admin");
+        return baseWebClient;
+    }
+    
+    private WebClient getSuperAdminWebClient() throws MalformedURLException {
+        WebClient baseWebClient = getBaseWebClient();
+        baseWebClient.header("token", "tomee");
+        return baseWebClient;
+    }
+    
+    private WebClient getWrongTokenWebClient() throws MalformedURLException {
+        WebClient baseWebClient = getBaseWebClient();
+        baseWebClient.header("token", "zappa");
+        return baseWebClient;
     }
 }
