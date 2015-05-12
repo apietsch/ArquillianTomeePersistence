@@ -13,7 +13,8 @@ public class AuthorizeBean implements AuthUtility {
 
     @Override
     public boolean authorize(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        System.out.println("Running Standard Bean");
+        return false;
     }
 
 }

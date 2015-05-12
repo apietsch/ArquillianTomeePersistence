@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import javax.enterprise.inject.Produces;
 import javax.ws.rs.core.MediaType;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -33,7 +34,10 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.waastad.arquillianpersistence.ejb.AuthorizeBean;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.waastad.arquillianpersistence.ejb.AuthUtility;
 import org.waastad.arquillianpersistence.entity.UserAccount;
 import org.waastad.arquillianpersistence.filter.TokenFilter;
 import org.waastad.arquillianpersistence.producer.EntityManagerProducer;
@@ -45,7 +49,11 @@ import org.waastad.arquillianpersistence.service.UserService;
  * @author Helge Waastad <helge.waastad@waastad.org>
  */
 @RunWith(Arquillian.class)
-public class RepositoryTest {
+public class RepositoryMockTest {
+
+    @Mock
+    @Produces
+    private static AuthUtility mockAuthUtility;
 
     @Deployment(testable = true)
     public static Archive<?> createDeploymentPackage() {
@@ -53,7 +61,7 @@ public class RepositoryTest {
 
         File[] libs = Maven.resolver().loadPomFromFile("pom.xml").importRuntimeDependencies().resolve().withTransitivity().asFile();
         return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addClasses(UserService.class, EntityManagerProducer.class, TokenFilter.class, UserAccountRepository.class, UserAccount.class, AuthorizeBean.class)
+                .addClasses(UserService.class, EntityManagerProducer.class, TokenFilter.class, UserAccountRepository.class, UserAccount.class, AuthUtility.class)
                 .addAsWebInfResource(new StringAsset(beans.exportAsString()), "beans.xml")
                 .addAsWebInfResource("tomee/test-persistence.xml", "persistence.xml")
                 .addAsManifestResource("tomee/test-context.xml", "context.xml")
@@ -65,6 +73,12 @@ public class RepositoryTest {
 
     @Test
     @InSequence(value = 1)
+    public void testMock() throws Exception {
+        Assert.assertNotNull(mockAuthUtility);
+    }
+
+    @Test
+    @InSequence(value = 2)
     @Transactional(TransactionMode.COMMIT)
     @UsingDataSet("users.yml")
     public void testSomeMethod3() throws Exception {
@@ -87,10 +101,11 @@ public class RepositoryTest {
     @Test
     @InSequence(value = 2)
     public void testBoolean() throws Exception {
+        Mockito.when(mockAuthUtility.authorize(Matchers.anyString())).thenReturn(Boolean.TRUE);
         WebClient client = getAdminWebClient()
                 .path("users/boolean");
         Boolean get = client.get(Boolean.class);
-        Assert.assertFalse(get);
+        Assert.assertTrue(get);
     }
 
     private WebClient getBaseWebClient() throws MalformedURLException {

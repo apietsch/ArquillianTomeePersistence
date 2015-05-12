@@ -151,8 +151,6 @@
                 <version>2.18.1</version>
                 <configuration>
                     <systemPropertyVariables>
-                        <!--  <tomee.classifier>plus</tomee.classifier>
-                        <tomee.version>${tomee.version}</tomee.version>-->
                         <arquillian.launch>tomee-embedded</arquillian.launch>
                         <openejb.arquillian.adapter>tomee-embedded</openejb.arquillian.adapter>
                         <java.security.auth.login.config>${project.basedir}/src/test/resources/tomee/login.config</java.security.auth.login.config>

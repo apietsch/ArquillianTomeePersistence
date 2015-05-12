@@ -40,15 +40,19 @@ public class UserService {
     public List<UserAccount> getUsers() {
         return userAccountRepository.findAll();
     }
-    
+
     @GET
     @Path("super")
     @RolesAllowed("superadmins")
     public List<UserAccount> getSuperUsers() {
         return userAccountRepository.findAll();
     }
-    
-    
+
+    @GET
+    @Path("boolean")
+    public Boolean getBoolean() {
+        return authorizeBean.authorize("asdSAD");
+    }
 
     @POST
     public UserAccount createUser(UserAccount account) {
