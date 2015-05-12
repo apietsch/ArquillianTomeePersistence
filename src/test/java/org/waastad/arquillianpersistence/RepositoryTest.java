@@ -56,8 +56,8 @@ public class RepositoryTest {
         return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(UserService.class, AuthorizeBean.class, EntityManagerProducer.class, TokenFilter.class, UserAccountRepository.class, UserAccount.class, AuthUtility.class)
                 .addAsWebInfResource(new StringAsset(beans.exportAsString()), "beans.xml")
-                .addAsWebInfResource("test-persistence.xml", "persistence.xml")
-                .addAsManifestResource("test-context.xml", "context.xml")
+                .addAsWebInfResource("tomee/test-persistence.xml", "persistence.xml")
+                .addAsManifestResource("tomee/test-context.xml", "context.xml")
                 .addAsLibraries(libs);
     }
 
@@ -67,7 +67,7 @@ public class RepositoryTest {
     @Test
     @InSequence(value = 1)
     @Transactional(TransactionMode.COMMIT)
-    @UsingDataSet("datasets/users.yml")
+    @UsingDataSet("users.yml")
     public void testSomeMethod3() throws Exception {
         WebClient client = getAdminWebClient()
                 .path("users");
